@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Our Memory Vault</title>
+<title>Moments That Found Us</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
 
@@ -16,231 +16,142 @@
 }
 
 body{
-  background:#0b0b0b;
+  background:radial-gradient(circle at top, #1a1a1a, #000);
   color:#fff;
-  min-height:100vh;
+  height:100vh;
   overflow:hidden;
 }
 
-/* SCREENS */
-.screen{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:24px;
-  opacity:0;
-  transition:opacity 1.2s ease;
-}
-.screen.active{
-  opacity:1;
-  z-index:1;
-}
-
-/* LANDING */
-.landing h1{
-  font-size:1.8rem;
-  margin-bottom:18px;
-}
-.landing p{
-  opacity:.75;
-  line-height:1.7;
-  max-width:320px;
-}
-.open-btn{
-  margin-top:40px;
-  padding:14px 36px;
-  border-radius:30px;
-  background:linear-gradient(135deg,#ff8fb1,#ffb3c7);
-  color:#000;
-  font-size:1rem;
-  cursor:pointer;
-  box-shadow:0 0 25px rgba(255,143,177,.4);
-}
-
-/* VAULT */
-.vault{
-  width:100%;
-  max-width:360px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-.card{
-  background:rgba(255,255,255,.06);
-  border-radius:18px;
-  padding:22px;
-  cursor:pointer;
+/* CONTAINER */
+#container{
   position:relative;
-  box-shadow:0 0 25px rgba(255,143,177,.15);
-}
-.card::after{
-  content:"🔒";
-  position:absolute;
-  top:12px;
-  right:14px;
-  opacity:.6;
-}
-.card-title{
-  font-size:1rem;
-  line-height:1.4;
-}
-
-/* MODAL */
-.modal{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.92);
+  width:100%;
+  height:100%;
   display:flex;
   justify-content:center;
   align-items:center;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .6s ease;
-}
-.modal.show{
-  opacity:1;
-  pointer-events:auto;
-}
-.modal-content{
-  max-width:90%;
-  text-align:center;
-  animation:fadeUp .8s ease;
 }
 
-/* FULL IMAGE */
-.modal-content img{
-  width:100%;
-  max-height:70vh;
-  object-fit:contain;
+/* PHOTO FRAME */
+.photo{
+  position:absolute;
+  width:75vw;
+  max-width:320px;
   border-radius:18px;
-  margin-bottom:20px;
-  box-shadow:0 0 40px rgba(255,143,177,.35);
-  background:#000;
-  animation:softReveal 1.2s ease;
+  opacity:0;
+  transform:scale(1.05);
+  transition:opacity 3s ease, transform 6s ease;
+  box-shadow:0 20px 50px rgba(0,0,0,0.7);
 }
 
-.modal-content p{
-  line-height:1.8;
-  opacity:.9;
-}
-.close{
-  margin-top:30px;
-  opacity:.6;
-  font-size:.9rem;
+.photo.show{
+  opacity:1;
+  transform:scale(1);
 }
 
-/* FINAL */
-.final h1{
-  font-size:1.8rem;
-  margin-bottom:14px;
-}
-.final p{
-  opacity:.75;
-}
-
-@keyframes fadeUp{
-  from{ transform:translateY(20px); opacity:0;}
-  to{ transform:translateY(0); opacity:1;}
+/* TEXT */
+#text{
+  position:absolute;
+  bottom:10%;
+  text-align:center;
+  font-size:1.1rem;
+  opacity:0.75;
 }
 
-@keyframes softReveal{
-  from{ opacity:0; transform:scale(.97);}
-  to{ opacity:1; transform:scale(1);}
+/* FINAL MESSAGE */
+#final{
+  position:absolute;
+  text-align:center;
+  opacity:0;
+  transition:opacity 3s ease;
+}
+
+#final h1{
+  font-size:2rem;
+  margin-bottom:10px;
+}
+
+#final p{
+  opacity:0.8;
+}
+
+/* MUSIC ICON */
+#musicToggle{
+  position:fixed;
+  top:15px;
+  right:15px;
+  font-size:1.3rem;
+  opacity:0.7;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LANDING SCREEN -->
-<div class="screen landing active">
-  <h1>Some memories are too precious</h1>
-  <p>So I kept them gently,<br>just for us.</p>
-  <div class="open-btn" onclick="openVault()">Open the Vault</div>
-</div>
+<audio id="music" loop>
+  <source src="music.mp3">
+</audio>
 
-<!-- VAULT SCREEN -->
-<div class="screen" id="vaultScreen">
-  <div class="vault">
-    <div class="card" onclick="openMemory(0)">
-      <div class="card-title">The First Hello</div>
-    </div>
-    <div class="card" onclick="openMemory(1)">
-      <div class="card-title">That One Laugh</div>
-    </div>
-    <div class="card" onclick="openMemory(2)">
-      <div class="card-title">Us, Becoming Us</div>
-    </div>
-    <div class="card" onclick="openMemory(3)">
-      <div class="card-title">A Quiet Promise</div>
-    </div>
+<div id="musicToggle">🎵</div>
+
+<div id="container">
+
+  <!-- PHOTOS -->
+  <img class="photo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..." />
+  <img class="photo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..." />
+  <img class="photo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..." />
+  <img class="photo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..." />
+
+  <div id="text">
+    Some moments don’t ask permission.<br>
+    They quietly become everything.
   </div>
-</div>
 
-<!-- MEMORY MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-content" id="modalContent"></div>
-</div>
+  <div id="final">
+    <h1>Always You ❤️</h1>
+    <p>30-Nov-2026 💍</p>
+  </div>
 
-<!-- FINAL SCREEN -->
-<div class="screen final" id="finalScreen">
-  <h1>Some choices feel easy</h1>
-  <p>You are one of them.</p>
 </div>
 
 <script>
-const screens = document.querySelectorAll('.screen');
-const modal = document.getElementById('modal');
-const modalContent = document.getElementById('modalContent');
+const photos = document.querySelectorAll('.photo');
+const final = document.getElementById('final');
+const music = document.getElementById('music');
+const toggle = document.getElementById('musicToggle');
 
-const memories = [
-  {
-    img:"images/memory1.jpeg",
-    text:`I didn’t know it then,<br>
-    but that small hello<br>
-    quietly changed my days.`
-  },
-  {
-    img:"images/memory2.jpeg",
-    text:`Some laughs don’t fade.<br>
-    They stay —<br>
-    like they found a home.`
-  },
-  {
-    img:"images/memory3.jpeg",
-    text:`We didn’t rush.<br>
-    We didn’t force.<br>
-    We just kept choosing honesty.`
-  },
-  {
-    img:"images/memory4.jpeg",
-    text:`Nothing loud.<br>
-    Nothing dramatic.<br>
-    Just a gentle promise to care.`
+let index = 0;
+
+/* MUSIC TOGGLE */
+toggle.onclick = ()=>{
+  if(music.paused){
+    music.play();
+    toggle.innerText = "🔊";
+  }else{
+    music.pause();
+    toggle.innerText = "🎵";
   }
-];
-
-function openVault(){
-  screens[0].classList.remove('active');
-  screens[1].classList.add('active');
-}
-
-function openMemory(i){
-  modalContent.innerHTML = `
-    <img src="${memories[i].img}" alt="Memory">
-    <p>${memories[i].text}</p>
-    <div class="close">(tap anywhere to close)</div>
-  `;
-  modal.classList.add('show');
-}
-
-modal.onclick = ()=>{
-  modal.classList.remove('show');
 };
+
+/* SHOW PHOTOS ONE BY ONE */
+function showNext(){
+  if(index > 0){
+    photos[index-1].classList.remove('show');
+  }
+
+  if(index < photos.length){
+    photos[index].classList.add('show');
+    index++;
+  }else{
+    setTimeout(()=>{
+      final.style.opacity = 1;
+    },3000);
+    clearInterval(timer);
+  }
+}
+
+const timer = setInterval(showNext, 7000);
+showNext();
 </script>
 
 </body>
