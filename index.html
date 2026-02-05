@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SVM Interactive Visualization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f4f6f8;
+}
+canvas {
+    background: #fff;
+    border: 2px solid #333;
+    margin-top: 10px;
+}
+.controls {
+    margin-top: 10px;
+}
+input, select, button {
+    padding: 6px;
+    margin: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Support Vector Machine (SVM) – Interactive Graph</h2>
+
+<canvas id="svmCanvas" width="350" height="350"></canvas>
+
+<div class="controls">
+    X: <input type="number" id="xVal" value="2">
+    Y: <input type="number" id="yVal" value="2">
+    Class:
+    <select id="label">
+        <option value="1">+1 (Blue)</option>
+        <option value="-1">-1 (Red)</option>
+    </select>
+    <button onclick="addPoint()">Add Point</button>
+</div>
+
+<p>Decision Boundary updates automatically when new points are added.</p>
+
+<script>
+const canvas = document.getElementById("svmCanvas");
+const ctx = canvas.getContext("2d");
+
+let data = [
+    {x: 1, y: 3, label: 1},
+    {x: 2, y: 4, label: 1},
+    {x: 4, y: 1, label: -1},
+    {x: 5, y: 2, label: -1}
+];
+
+let w = [1, -1];
+let b = 0;
+
+function scale(val) {
+    return val * 50;
+}
+
+function drawAxes() {
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.stroke();
+}
+
+function drawPoints() {
+    data.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(
+            canvas.width / 2 + scale(p.x),
+            canvas.height / 2 - scale(p.y),
+            6, 0, Math.PI * 2
+        );
+        ctx.fillStyle = p.label === 1 ? "blue" : "red";
+        ctx.fill();
+    });
+}
+
+function trainSVM() {
+    let lr = 0.01;
+    for (let i = 0; i < 500; i++) {
+        data.forEach(p => {
+            let condition = p.label * (w[0]*p.x + w[1]*p.y + b) >= 1;
+            if (!condition) {
+                w[0] += lr * p.label * p.x;
+                w[1] += lr * p.label * p.y;
+                b += lr * p.label;
+            }
+        });
+    }
+}
+
+function drawDecisionBoundary() {
+    let x1 = -4;
+    let x2 = 4;
+    let y1 = (-w[0]*x1 - b) / w[1];
+    let y2 = (-w[0]*x2 - b) / w[1];
+
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2 + scale(x1), canvas.height / 2 - scale(y1));
+    ctx.lineTo(canvas.width / 2 + scale(x2), canvas.height / 2 - scale(y2));
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+function redraw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawAxes();
+    trainSVM();
+    drawDecisionBoundary();
+    drawPoints();
+}
+
+function addPoint() {
+    let x = parseFloat(document.getElementById("xVal").value);
+    let y = parseFloat(document.getElementById("yVal").value);
+    let label = parseInt(document.getElementById("label").value);
+
+    data.push({x, y, label});
+    redraw();
+}
+
+redraw();
+</script>
+
+</body>
+</html>
