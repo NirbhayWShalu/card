@@ -2,135 +2,245 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SVM Interactive Visualization</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Memory Vault</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: #f4f6f8;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Playfair Display', serif;
 }
-canvas {
-    background: #fff;
-    border: 2px solid #333;
-    margin-top: 10px;
+
+body{
+  background:#0b0b0b;
+  color:#fff;
+  min-height:100vh;
+  overflow:hidden;
 }
-.controls {
-    margin-top: 10px;
+
+/* SCREENS */
+.screen{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:24px;
+  opacity:0;
+  transition:opacity 1.2s ease;
 }
-input, select, button {
-    padding: 6px;
-    margin: 5px;
+.screen.active{
+  opacity:1;
+  z-index:1;
+}
+
+/* LANDING */
+.landing h1{
+  font-size:1.8rem;
+  margin-bottom:18px;
+}
+.landing p{
+  opacity:.75;
+  line-height:1.7;
+  max-width:320px;
+}
+.open-btn{
+  margin-top:40px;
+  padding:14px 36px;
+  border-radius:30px;
+  background:linear-gradient(135deg,#ff8fb1,#ffb3c7);
+  color:#000;
+  font-size:1rem;
+  cursor:pointer;
+  box-shadow:0 0 25px rgba(255,143,177,.4);
+}
+
+/* VAULT */
+.vault{
+  width:100%;
+  max-width:360px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+.card{
+  background:rgba(255,255,255,.06);
+  border-radius:18px;
+  padding:22px;
+  cursor:pointer;
+  position:relative;
+  box-shadow:0 0 25px rgba(255,143,177,.15);
+}
+.card::after{
+  content:"🔒";
+  position:absolute;
+  top:12px;
+  right:14px;
+  opacity:.6;
+}
+.card-title{
+  font-size:1rem;
+  line-height:1.4;
+}
+
+/* MODAL */
+.modal{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.92);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .6s ease;
+}
+.modal.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.modal-content{
+  max-width:90%;
+  text-align:center;
+  animation:fadeUp .8s ease;
+}
+
+/* FULL IMAGE */
+.modal-content img{
+  width:100%;
+  max-height:70vh;
+  object-fit:contain;
+  border-radius:18px;
+  margin-bottom:20px;
+  box-shadow:0 0 40px rgba(255,143,177,.35);
+  background:#000;
+  animation:softReveal 1.2s ease;
+}
+
+.modal-content p{
+  line-height:1.8;
+  opacity:.9;
+}
+.close{
+  margin-top:30px;
+  opacity:.6;
+  font-size:.9rem;
+}
+
+/* FINAL */
+.final h1{
+  font-size:1.8rem;
+  margin-bottom:14px;
+}
+.final p{
+  opacity:.75;
+}
+
+@keyframes fadeUp{
+  from{ transform:translateY(20px); opacity:0;}
+  to{ transform:translateY(0); opacity:1;}
+}
+
+@keyframes softReveal{
+  from{ opacity:0; transform:scale(.97);}
+  to{ opacity:1; transform:scale(1);}
 }
 </style>
 </head>
 
 <body>
 
-<h2>Support Vector Machine (SVM) – Interactive Graph</h2>
-
-<canvas id="svmCanvas" width="350" height="350"></canvas>
-
-<div class="controls">
-    X: <input type="number" id="xVal" value="2">
-    Y: <input type="number" id="yVal" value="2">
-    Class:
-    <select id="label">
-        <option value="1">+1 (Blue)</option>
-        <option value="-1">-1 (Red)</option>
-    </select>
-    <button onclick="addPoint()">Add Point</button>
+<!-- LANDING SCREEN -->
+<div class="screen landing active">
+  <h1>Some memories are too precious</h1>
+  <p>So I kept them gently,<br>just for us.</p>
+  <div class="open-btn" onclick="openVault()">Open the Vault</div>
 </div>
 
-<p>Decision Boundary updates automatically when new points are added.</p>
+<!-- VAULT SCREEN -->
+<div class="screen" id="vaultScreen">
+  <div class="vault">
+    <div class="card" onclick="openMemory(0)">
+      <div class="card-title">The First Hello</div>
+    </div>
+    <div class="card" onclick="openMemory(1)">
+      <div class="card-title">That One Laugh</div>
+    </div>
+    <div class="card" onclick="openMemory(2)">
+      <div class="card-title">Us, Becoming Us</div>
+    </div>
+    <div class="card" onclick="openMemory(3)">
+      <div class="card-title">A Quiet Promise</div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMORY MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content" id="modalContent"></div>
+</div>
+
+<!-- FINAL SCREEN -->
+<div class="screen final" id="finalScreen">
+  <h1>Some choices feel easy</h1>
+  <p>You are one of them.</p>
+</div>
 
 <script>
-const canvas = document.getElementById("svmCanvas");
-const ctx = canvas.getContext("2d");
+const screens = document.querySelectorAll('.screen');
+const modal = document.getElementById('modal');
+const modalContent = document.getElementById('modalContent');
 
-let data = [
-    {x: 1, y: 3, label: 1},
-    {x: 2, y: 4, label: 1},
-    {x: 4, y: 1, label: -1},
-    {x: 5, y: 2, label: -1}
+const memories = [
+  {
+    img:"images/memory1.jpeg",
+    text:`I didn’t know it then,<br>
+    but that small hello<br>
+    quietly changed my days.`
+  },
+  {
+    img:"images/memory2.jpeg",
+    text:`Some laughs don’t fade.<br>
+    They stay —<br>
+    like they found a home.`
+  },
+  {
+    img:"images/memory3.jpeg",
+    text:`We didn’t rush.<br>
+    We didn’t force.<br>
+    We just kept choosing honesty.`
+  },
+  {
+    img:"images/memory4.jpeg",
+    text:`Nothing loud.<br>
+    Nothing dramatic.<br>
+    Just a gentle promise to care.`
+  }
 ];
 
-let w = [1, -1];
-let b = 0;
-
-function scale(val) {
-    return val * 50;
+function openVault(){
+  screens[0].classList.remove('active');
+  screens[1].classList.add('active');
 }
 
-function drawAxes() {
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height / 2);
-    ctx.lineTo(canvas.width, canvas.height / 2);
-    ctx.moveTo(canvas.width / 2, 0);
-    ctx.lineTo(canvas.width / 2, canvas.height);
-    ctx.stroke();
+function openMemory(i){
+  modalContent.innerHTML = `
+    <img src="${memories[i].img}" alt="Memory">
+    <p>${memories[i].text}</p>
+    <div class="close">(tap anywhere to close)</div>
+  `;
+  modal.classList.add('show');
 }
 
-function drawPoints() {
-    data.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(
-            canvas.width / 2 + scale(p.x),
-            canvas.height / 2 - scale(p.y),
-            6, 0, Math.PI * 2
-        );
-        ctx.fillStyle = p.label === 1 ? "blue" : "red";
-        ctx.fill();
-    });
-}
-
-function trainSVM() {
-    let lr = 0.01;
-    for (let i = 0; i < 500; i++) {
-        data.forEach(p => {
-            let condition = p.label * (w[0]*p.x + w[1]*p.y + b) >= 1;
-            if (!condition) {
-                w[0] += lr * p.label * p.x;
-                w[1] += lr * p.label * p.y;
-                b += lr * p.label;
-            }
-        });
-    }
-}
-
-function drawDecisionBoundary() {
-    let x1 = -4;
-    let x2 = 4;
-    let y1 = (-w[0]*x1 - b) / w[1];
-    let y2 = (-w[0]*x2 - b) / w[1];
-
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 + scale(x1), canvas.height / 2 - scale(y1));
-    ctx.lineTo(canvas.width / 2 + scale(x2), canvas.height / 2 - scale(y2));
-    ctx.strokeStyle = "green";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-}
-
-function redraw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawAxes();
-    trainSVM();
-    drawDecisionBoundary();
-    drawPoints();
-}
-
-function addPoint() {
-    let x = parseFloat(document.getElementById("xVal").value);
-    let y = parseFloat(document.getElementById("yVal").value);
-    let label = parseInt(document.getElementById("label").value);
-
-    data.push({x, y, label});
-    redraw();
-}
-
-redraw();
+modal.onclick = ()=>{
+  modal.classList.remove('show');
+};
 </script>
 
 </body>
