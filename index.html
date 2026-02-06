@@ -40,9 +40,14 @@ body{
   pointer-events:none;
 }
 
+#lockIcon{
+  font-size:3.2rem;
+  margin-bottom:12px;
+}
+
 #lockText{
   font-size:1.2rem;
-  opacity:0.8;
+  opacity:0.85;
   animation:pulse 2s infinite;
 }
 
@@ -61,16 +66,16 @@ body{
   align-items:center;
 }
 
-/* PHOTO */
+/* PHOTO (CENTERED ALWAYS) */
 .photo{
   position:absolute;
   top:50%;
   left:50%;
-  transform:translate3d(-50%, -40%, 0);
   width:75vw;
-  max-width:330px;
+  max-width:320px;
   border-radius:18px;
   opacity:0;
+  transform:translate3d(-50%, -45%, 0);
   transition:opacity 2s ease, transform 2s ease;
   box-shadow:0 30px 60px rgba(0,0,0,0.7);
   will-change:opacity, transform;
@@ -84,7 +89,8 @@ body{
 /* CAPTION */
 .caption{
   position:absolute;
-  bottom:18%;
+  bottom:14%;
+  width:100%;
   text-align:center;
   font-size:1.05rem;
   opacity:0;
@@ -93,7 +99,7 @@ body{
 }
 
 .caption.show{
-  opacity:0.8;
+  opacity:0.85;
 }
 
 /* FINAL TEXT */
@@ -109,7 +115,7 @@ body{
 #collageOverlay{
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,0.65);
   opacity:0;
   transition:opacity 1.4s ease;
   pointer-events:none;
@@ -122,17 +128,28 @@ body{
 
 #container.collage .photo{
   opacity:1;
-  transform:scale(0.8);
   transition:transform 1.6s ease;
 }
 
-/* COLLAGE POSITIONS */
-#container.collage .photo:nth-of-type(1){ top:12%; left:18%; }
-#container.collage .photo:nth-of-type(2){ top:12%; right:18%; left:auto; }
-#container.collage .photo:nth-of-type(3){ top:38%; left:8%; }
-#container.collage .photo:nth-of-type(4){ top:38%; right:8%; left:auto; }
-#container.collage .photo:nth-of-type(5){ bottom:12%; left:22%; top:auto; }
-#container.collage .photo:nth-of-type(6){ bottom:12%; right:22%; left:auto; top:auto; }
+/* SAFE COLLAGE POSITIONS */
+#container.collage .photo:nth-of-type(1){
+  top:14%; left:20%; transform:scale(0.7);
+}
+#container.collage .photo:nth-of-type(2){
+  top:14%; left:60%; transform:scale(0.7);
+}
+#container.collage .photo:nth-of-type(3){
+  top:40%; left:12%; transform:scale(0.7);
+}
+#container.collage .photo:nth-of-type(4){
+  top:40%; left:68%; transform:scale(0.7);
+}
+#container.collage .photo:nth-of-type(5){
+  top:66%; left:28%; transform:scale(0.7);
+}
+#container.collage .photo:nth-of-type(6){
+  top:66%; left:56%; transform:scale(0.7);
+}
 
 #container.collage #final{
   opacity:1;
@@ -154,8 +171,9 @@ body{
 
 <body>
 
-<!-- LOCK -->
+<!-- LOCK SCREEN -->
 <div id="lockScreen">
+  <div id="lockIcon">🔒</div>
   <div id="lockText">Touch with love ❤️</div>
 </div>
 
@@ -175,10 +193,10 @@ body{
 
   <!-- CAPTIONS -->
   <div class="caption">It all started with a simple hello.</div>
-  <div class="caption">Some conversations just felt like home.</div>
-  <div class="caption">Every smile slowly became my favorite place.</div>
-  <div class="caption">Even silence felt beautiful with you.</div>
-  <div class="caption">Some moments quietly changed everything.</div>
+  <div class="caption">Some conversations quietly became home.</div>
+  <div class="caption">Every smile felt a little more special.</div>
+  <div class="caption">Even silence felt warm with you.</div>
+  <div class="caption">Some moments changed everything.</div>
   <div class="caption">And somehow… it was always you.</div>
 
   <div id="final">
@@ -212,7 +230,7 @@ function showNext(){
     index++;
   } else {
     clearInterval(timer);
-    captions[photos.length-1].classList.remove('show');
+    captions[photos.length - 1].classList.remove('show');
 
     setTimeout(()=>{
       container.classList.add('collage');
