@@ -40,14 +40,9 @@ body{
   pointer-events:none;
 }
 
-#lockIcon{
-  font-size:3rem;
-  margin-bottom:14px;
-}
-
 #lockText{
   font-size:1.2rem;
-  opacity:0.75;
+  opacity:0.8;
   animation:pulse 2s infinite;
 }
 
@@ -66,35 +61,42 @@ body{
   align-items:center;
 }
 
-/* PHOTO (SMOOTH & SAFE) */
+/* PHOTO */
 .photo{
   position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate3d(-50%, -40%, 0);
   width:75vw;
   max-width:330px;
   border-radius:18px;
   opacity:0;
-  transform:translate3d(0,20px,0);
-  transition:opacity 2.2s ease, transform 2.2s ease;
+  transition:opacity 2s ease, transform 2s ease;
   box-shadow:0 30px 60px rgba(0,0,0,0.7);
   will-change:opacity, transform;
 }
 
 .photo.show{
   opacity:1;
-  transform:translate3d(0,0,0);
+  transform:translate3d(-50%, -50%, 0);
 }
 
-/* TEXT */
-#text{
+/* CAPTION */
+.caption{
   position:absolute;
-  bottom:10%;
+  bottom:18%;
   text-align:center;
-  font-size:1.1rem;
-  opacity:0.75;
-  padding:0 16px;
+  font-size:1.05rem;
+  opacity:0;
+  transition:opacity 1.6s ease;
+  padding:0 18px;
 }
 
-/* FINAL MESSAGE */
+.caption.show{
+  opacity:0.8;
+}
+
+/* FINAL TEXT */
 #final{
   position:absolute;
   text-align:center;
@@ -102,7 +104,7 @@ body{
   transform:translate3d(0,20px,0);
 }
 
-/* ================= COLLAGE EFFECT ================= */
+/* ================= COLLAGE ================= */
 
 #collageOverlay{
   position:absolute;
@@ -120,17 +122,17 @@ body{
 
 #container.collage .photo{
   opacity:1;
-  transform:translate3d(0,0,0) scale(0.85);
-  transition:opacity 1.6s ease, transform 1.6s ease;
+  transform:scale(0.8);
+  transition:transform 1.6s ease;
 }
 
 /* COLLAGE POSITIONS */
-#container.collage .photo:nth-of-type(1){ top:10%; left:18%; }
-#container.collage .photo:nth-of-type(2){ top:10%; right:18%; }
+#container.collage .photo:nth-of-type(1){ top:12%; left:18%; }
+#container.collage .photo:nth-of-type(2){ top:12%; right:18%; left:auto; }
 #container.collage .photo:nth-of-type(3){ top:38%; left:8%; }
-#container.collage .photo:nth-of-type(4){ top:38%; right:8%; }
-#container.collage .photo:nth-of-type(5){ bottom:12%; left:22%; }
-#container.collage .photo:nth-of-type(6){ bottom:12%; right:22%; }
+#container.collage .photo:nth-of-type(4){ top:38%; right:8%; left:auto; }
+#container.collage .photo:nth-of-type(5){ bottom:12%; left:22%; top:auto; }
+#container.collage .photo:nth-of-type(6){ bottom:12%; right:22%; left:auto; top:auto; }
 
 #container.collage #final{
   opacity:1;
@@ -152,9 +154,8 @@ body{
 
 <body>
 
-<!-- LOCK SCREEN -->
+<!-- LOCK -->
 <div id="lockScreen">
-  <div id="lockIcon">🔒</div>
   <div id="lockText">Touch with love ❤️</div>
 </div>
 
@@ -172,10 +173,13 @@ body{
   <img class="photo" src="Img5.jpg">
   <img class="photo" src="Img6.jpg">
 
-  <div id="text">
-    Some moments don’t ask permission.<br>
-    They quietly become everything.
-  </div>
+  <!-- CAPTIONS -->
+  <div class="caption">It all started with a simple hello.</div>
+  <div class="caption">Some conversations just felt like home.</div>
+  <div class="caption">Every smile slowly became my favorite place.</div>
+  <div class="caption">Even silence felt beautiful with you.</div>
+  <div class="caption">Some moments quietly changed everything.</div>
+  <div class="caption">And somehow… it was always you.</div>
 
   <div id="final">
     <h1>Always You ❤️</h1>
@@ -189,37 +193,35 @@ body{
 const lockScreen = document.getElementById('lockScreen');
 const music = document.getElementById('music');
 const photos = document.querySelectorAll('.photo');
+const captions = document.querySelectorAll('.caption');
 const container = document.getElementById('container');
 
 let index = 0;
 let timer;
 
-/* PHOTO SEQUENCE */
 function showNext(){
   if(index < photos.length){
     photos[index].classList.add('show');
+    captions[index].classList.add('show');
 
     if(index > 0){
-      setTimeout(()=>{
-        photos[index - 1].classList.remove('show');
-      },1000);
+      photos[index-1].classList.remove('show');
+      captions[index-1].classList.remove('show');
     }
 
     index++;
   } else {
     clearInterval(timer);
+    captions[photos.length-1].classList.remove('show');
 
-    // Dramatic pause then collage
     setTimeout(()=>{
       container.classList.add('collage');
     },1200);
   }
 }
 
-/* START EVERYTHING ON FIRST TOUCH */
 lockScreen.addEventListener('click', ()=>{
   lockScreen.classList.add('fade');
-
   music.volume = 0.6;
   music.play();
 
