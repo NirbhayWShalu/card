@@ -16,7 +16,7 @@
 }
 
 body{
-  background:radial-gradient(circle at top, #1a1a1a, #000);
+  background:radial-gradient(circle at top, #141414, #000);
   color:#fff;
   height:100vh;
   overflow:hidden;
@@ -32,7 +32,7 @@ body{
   justify-content:center;
   align-items:center;
   z-index:10;
-  transition:opacity 1.8s ease;
+  transition:opacity 1.6s ease;
 }
 
 #lockScreen.fade{
@@ -41,15 +41,13 @@ body{
 }
 
 #lockIcon{
-  font-size:3.2rem;
-  margin-bottom:15px;
-  opacity:0.85;
+  font-size:3rem;
+  margin-bottom:14px;
 }
 
 #lockText{
   font-size:1.2rem;
-  letter-spacing:1px;
-  opacity:0.8;
+  opacity:0.75;
   animation:pulse 2s infinite;
 }
 
@@ -58,7 +56,7 @@ body{
   50%{ opacity:1; }
 }
 
-/* ================= MAIN CONTAINER ================= */
+/* ================= MAIN ================= */
 #container{
   position:relative;
   width:100%;
@@ -68,22 +66,22 @@ body{
   align-items:center;
 }
 
-/* PHOTO FRAME */
+/* PHOTO (SMOOTH & SAFE) */
 .photo{
   position:absolute;
   width:75vw;
-  max-width:320px;
+  max-width:330px;
   border-radius:18px;
   opacity:0;
-  transform:translateZ(0) scale(1.02);
-  transition:opacity 1.8s ease, transform 2.8s ease;
-  box-shadow:0 20px 50px rgba(0,0,0,0.7);
+  transform:translate3d(0,20px,0);
+  transition:opacity 2.2s ease, transform 2.2s ease;
+  box-shadow:0 30px 60px rgba(0,0,0,0.7);
   will-change:opacity, transform;
 }
 
 .photo.show{
   opacity:1;
-  transform:translateZ(0) scale(1);
+  transform:translate3d(0,0,0);
 }
 
 /* TEXT */
@@ -93,7 +91,7 @@ body{
   text-align:center;
   font-size:1.1rem;
   opacity:0.75;
-  padding:0 15px;
+  padding:0 16px;
 }
 
 /* FINAL MESSAGE */
@@ -101,7 +99,44 @@ body{
   position:absolute;
   text-align:center;
   opacity:0;
-  transition:opacity 3s ease;
+  transform:translate3d(0,20px,0);
+}
+
+/* ================= COLLAGE EFFECT ================= */
+
+#collageOverlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  opacity:0;
+  transition:opacity 1.4s ease;
+  pointer-events:none;
+  z-index:2;
+}
+
+#container.collage #collageOverlay{
+  opacity:1;
+}
+
+#container.collage .photo{
+  opacity:1;
+  transform:translate3d(0,0,0) scale(0.85);
+  transition:opacity 1.6s ease, transform 1.6s ease;
+}
+
+/* COLLAGE POSITIONS */
+#container.collage .photo:nth-of-type(1){ top:10%; left:18%; }
+#container.collage .photo:nth-of-type(2){ top:10%; right:18%; }
+#container.collage .photo:nth-of-type(3){ top:38%; left:8%; }
+#container.collage .photo:nth-of-type(4){ top:38%; right:8%; }
+#container.collage .photo:nth-of-type(5){ bottom:12%; left:22%; }
+#container.collage .photo:nth-of-type(6){ bottom:12%; right:22%; }
+
+#container.collage #final{
+  opacity:1;
+  transform:translate3d(0,0,0);
+  transition:opacity 2s ease, transform 2s ease;
+  z-index:5;
 }
 
 #final h1{
@@ -110,14 +145,14 @@ body{
 }
 
 #final p{
-  opacity:0.8;
+  opacity:0.85;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔒 LOCK SCREEN -->
+<!-- LOCK SCREEN -->
 <div id="lockScreen">
   <div id="lockIcon">🔒</div>
   <div id="lockText">Touch with love ❤️</div>
@@ -147,47 +182,50 @@ body{
     <p>30-Nov-2026 💍</p>
   </div>
 
+  <div id="collageOverlay"></div>
 </div>
 
 <script>
 const lockScreen = document.getElementById('lockScreen');
 const music = document.getElementById('music');
 const photos = document.querySelectorAll('.photo');
-const final = document.getElementById('final');
+const container = document.getElementById('container');
 
 let index = 0;
 let timer;
 
 /* PHOTO SEQUENCE */
 function showNext(){
-  if(index > 0){
-    photos[index - 1].classList.remove('show');
-  }
-
   if(index < photos.length){
     photos[index].classList.add('show');
+
+    if(index > 0){
+      setTimeout(()=>{
+        photos[index - 1].classList.remove('show');
+      },1000);
+    }
+
     index++;
   } else {
     clearInterval(timer);
-    setTimeout(() => {
-      final.style.opacity = 1;
-    }, 2000);
+
+    // Dramatic pause then collage
+    setTimeout(()=>{
+      container.classList.add('collage');
+    },1200);
   }
 }
 
 /* START EVERYTHING ON FIRST TOUCH */
-lockScreen.addEventListener('click', () => {
-  // Fade lock screen
+lockScreen.addEventListener('click', ()=>{
   lockScreen.classList.add('fade');
 
-  // Start music
   music.volume = 0.6;
   music.play();
 
-  // Start slideshow
   showNext();
-  timer = setInterval(showNext, 4500);
-}, { once:true });
+  timer = setInterval(showNext, 4200);
+},{ once:true });
 </script>
 
 </body>
