@@ -22,7 +22,43 @@ body{
   overflow:hidden;
 }
 
-/* CONTAINER */
+/* ================= LOCK SCREEN ================= */
+#lockScreen{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top, #111, #000);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:10;
+  transition:opacity 1.8s ease;
+}
+
+#lockScreen.fade{
+  opacity:0;
+  pointer-events:none;
+}
+
+#lockIcon{
+  font-size:3.2rem;
+  margin-bottom:15px;
+  opacity:0.85;
+}
+
+#lockText{
+  font-size:1.2rem;
+  letter-spacing:1px;
+  opacity:0.8;
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{ opacity:0.4; }
+  50%{ opacity:1; }
+}
+
+/* ================= MAIN CONTAINER ================= */
 #container{
   position:relative;
   width:100%;
@@ -39,14 +75,15 @@ body{
   max-width:320px;
   border-radius:18px;
   opacity:0;
-  transform:scale(1.05);
-  transition:opacity 3s ease, transform 6s ease;
+  transform:translateZ(0) scale(1.02);
+  transition:opacity 1.8s ease, transform 2.8s ease;
   box-shadow:0 20px 50px rgba(0,0,0,0.7);
+  will-change:opacity, transform;
 }
 
 .photo.show{
   opacity:1;
-  transform:scale(1);
+  transform:translateZ(0) scale(1);
 }
 
 /* TEXT */
@@ -56,6 +93,7 @@ body{
   text-align:center;
   font-size:1.1rem;
   opacity:0.75;
+  padding:0 15px;
 }
 
 /* FINAL MESSAGE */
@@ -74,35 +112,31 @@ body{
 #final p{
   opacity:0.8;
 }
-
-/* MUSIC ICON */
-#musicToggle{
-  position:fixed;
-  top:15px;
-  right:15px;
-  font-size:1.3rem;
-  opacity:0.7;
-}
 </style>
 </head>
 
 <body>
 
-<audio id="music" loop>
-  <source src="music.mp3">
-</audio>
+<!-- 🔒 LOCK SCREEN -->
+<div id="lockScreen">
+  <div id="lockIcon">🔒</div>
+  <div id="lockText">Touch with love ❤️</div>
+</div>
 
-<div id="musicToggle">🎵</div>
+<audio id="music" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
 
 <div id="container">
 
   <!-- PHOTOS -->
-  <img class="photo" src="Img1.jpg" />
-  <img class="photo" src="Img2.jpg" />
-  <img class="photo" src="Img3.jpg" />
-  <img class="photo" src="Img4.jpg" />
-  <img class="photo" src="Img5.jpg" />
-  <img class="photo" src="Img6.jpg" />
+  <img class="photo" src="Img1.jpg">
+  <img class="photo" src="Img2.jpg">
+  <img class="photo" src="Img3.jpg">
+  <img class="photo" src="Img4.jpg">
+  <img class="photo" src="Img5.jpg">
+  <img class="photo" src="Img6.jpg">
+
   <div id="text">
     Some moments don’t ask permission.<br>
     They quietly become everything.
@@ -116,43 +150,44 @@ body{
 </div>
 
 <script>
+const lockScreen = document.getElementById('lockScreen');
+const music = document.getElementById('music');
 const photos = document.querySelectorAll('.photo');
 const final = document.getElementById('final');
-const music = document.getElementById('music');
-const toggle = document.getElementById('musicToggle');
 
 let index = 0;
+let timer;
 
-/* MUSIC TOGGLE */
-toggle.onclick = ()=>{
-  if(music.paused){
-    music.play();
-    toggle.innerText = "🔊";
-  }else{
-    music.pause();
-    toggle.innerText = "🎵";
-  }
-};
-
-/* SHOW PHOTOS ONE BY ONE */
+/* PHOTO SEQUENCE */
 function showNext(){
   if(index > 0){
-    photos[index-1].classList.remove('show');
+    photos[index - 1].classList.remove('show');
   }
 
   if(index < photos.length){
     photos[index].classList.add('show');
     index++;
-  }else{
-    setTimeout(()=>{
-      final.style.opacity = 1;
-    },3000);
+  } else {
     clearInterval(timer);
+    setTimeout(() => {
+      final.style.opacity = 1;
+    }, 2000);
   }
 }
 
-const timer = setInterval(showNext, 7000);
-showNext();
+/* START EVERYTHING ON FIRST TOUCH */
+lockScreen.addEventListener('click', () => {
+  // Fade lock screen
+  lockScreen.classList.add('fade');
+
+  // Start music
+  music.volume = 0.6;
+  music.play();
+
+  // Start slideshow
+  showNext();
+  timer = setInterval(showNext, 4500);
+}, { once:true });
 </script>
 
 </body>
